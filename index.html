@@ -1,18 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="style.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
-  <script src="script.js" defer></script>
-  <title>Your Website</title>
-</head>
-
-<body>
- <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,6 +43,7 @@
         <p>Because they make up everything!</p>
     </div>
 
+    <!-- Add more joke cards below -->
     <!-- Add more joke cards below -->
     <div class="card" draggable="true">
         <h2>Joke 2</h2>
@@ -237,7 +225,9 @@
         let draggedCard = null;
 
         cards.forEach(card => {
-            card.addEventListener('dragstart', () => {
+            // Mouse Events
+            card.addEventListener('dragstart', (e) => {
+                e.preventDefault(); // Prevent default behavior to enable drag-and-drop on touch devices
                 draggedCard = card;
                 setTimeout(() => {
                     card.style.display = 'none';
@@ -251,11 +241,11 @@
                 }, 0);
             });
 
-            card.addEventListener('dragover', e => {
+            card.addEventListener('dragover', (e) => {
                 e.preventDefault();
             });
 
-            card.addEventListener('dragenter', e => {
+            card.addEventListener('dragenter', (e) => {
                 e.preventDefault();
                 if (draggedCard !== null && draggedCard !== card) {
                     card.style.transform = 'scale(1.05)';
@@ -279,6 +269,56 @@
                 card.style.transform = 'scale(1)';
                 card.style.backgroundColor = getRandomLightColor();
             });
+
+            // Touch Events
+            let startX, startY;
+
+            card.addEventListener('touchstart', (e) => {
+                draggedCard = card;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 0);
+            });
+
+            card.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // Prevent scrolling when dragging on touch devices
+                const touch = e.touches[0];
+                const offsetX = touch.clientX - startX;
+                const offsetY = touch.clientY - startY;
+                card.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            });
+
+            card.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    draggedCard.style.display = 'block';
+                    draggedCard = null;
+                    card.style.transform = 'translate(0, 0)';
+                }, 0);
+            });
+
+            card.addEventListener('touchcancel', () => {
+                card.style.transform = 'translate(0, 0)';
+            });
+
+            card.addEventListener('touchleave', () => {
+                card.style.transform = 'translate(0, 0)';
+            });
+
+            card.addEventListener('touchend', () => {
+                if (draggedCard !== null && draggedCard !== card) {
+                    const cardIndex = Array.from(card.parentNode.children).indexOf(card);
+                    const draggedCardIndex = Array.from(card.parentNode.children).indexOf(draggedCard);
+                    if (cardIndex < draggedCardIndex) {
+                        card.parentNode.insertBefore(draggedCard, card.nextSibling);
+                    } else {
+                        card.parentNode.insertBefore(draggedCard, card);
+                    }
+                }
+                card.style.transform = 'translate(0, 0)';
+                card.style.backgroundColor = getRandomLightColor();
+            });
         });
 
         function getRandomLightColor() {
@@ -291,8 +331,4 @@
         }
     </script>
 </body>
-</html>
-
-</body>
-
 </html>
